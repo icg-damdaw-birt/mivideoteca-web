@@ -1,4 +1,4 @@
-# 🌐 MiVideoteca - Web App (SvelteKit)
+# 🌐 MiVideoteca - Web App (SvelteKit + Svelte 5)
 
 Aplicación web progresiva para gestionar tu colección de películas. 
 
@@ -7,35 +7,34 @@ Aplicación web progresiva para gestionar tu colección de películas.
 ```
 src/
 ├── lib/
-│   ├── api.service.ts       # Comunicación con la API
-│   ├── auth.store.ts        # Store de autenticación (JWT)
-│   ├── movies.store.ts      # Store de películas (CRUD)
-│   └── types.ts             # Tipos TypeScript
+│   ├── api.service.ts           # Comunicación con la API
+│   ├── auth.store.svelte.ts     # Store de autenticación (Svelte 5 Runes)
+│   ├── movies.store.svelte.ts   # Store de películas (Svelte 5 Runes)
+│   └── types.ts                 # Tipos TypeScript
 ├── routes/
-│   ├── (auth)/              # Rutas protegidas
-│   │   ├── movies/          # CRUD de películas
-│   │   └── +layout.svelte   # Layout con auth guard
-│   ├── login/               # Pantalla de login
-│   ├── register/            # Pantalla de registro
-│   └── +layout.svelte       # Layout global
-└── app.html                 # Template HTML
+│   ├── login/                   # Pantalla de login
+│   ├── register/                # Pantalla de registro
+│   ├── +page.svelte             # Página principal (CRUD películas)
+│   └── +layout.svelte           # Layout global
+└── app.html                     # Template HTML
 
-test/
-└── lib/                     # Tests unitarios
-    ├── api.service.test.ts  # Tests del servicio API (auth)
-    ├── auth.store.test.ts   # Tests del store de auth
-    └── movies.store.test.ts # ⏸️ Se creará en video UD4
+src/lib/
+└── components/                  # Componentes reutilizables
+    ├── Header.svelte
+    ├── MovieCard.svelte
+    └── MovieForm.svelte
 ```
 
 ## 🚀 Características
 
+- ✅ **Svelte 5 Runes**: `$state`, `$effect`, `$props`, `$bindable`
 - ✅ **Autenticación**: Login y registro con JWT
 - ✅ **CRUD de películas**: Crear, leer, actualizar y eliminar
 - ✅ **Persistencia de sesión**: Token guardado en localStorage
-- ✅ **Gestión de estado**: Svelte Stores (auth + movies)
+- ✅ **Gestión de estado**: Stores modernos con runes (`.svelte.ts`)
 - ✅ **Tests de Auth**: Implementados y funcionando
-- ✅ **Routing**: Sistema de rutas de SvelteKit
-- ✅ **SSR**: Server-Side Rendering opcional
+- ✅ **TypeScript estricto**: Type-safe en todo el proyecto
+- ✅ **Tailwind CSS**: UI responsive y moderna
 - 🔜 **Tests de Movies**: Se crearán en UD4 (video)
 - 🔜 **Favoritos**: Implementar + tests (UD4 - video)
 - 🔜 **Rating**: Implementar + tests (UD4 - ejercicio)
@@ -49,12 +48,13 @@ test/
 
 #### **Estado inicial:**
 - ✅ App funcionando con CRUD completo
-- ✅ `auth.store.ts` testeado
-- ✅ `movies.store.ts` implementado **sin tests**
+- ✅ **100% Svelte 5** (sin sintaxis legacy)
+- ✅ `auth.store.svelte.ts` testeado
+- ✅ `movies.store.svelte.ts` implementado **sin tests**
 - ⏸️ Favoritos y Rating pendientes
 
 #### **🎬 En el video harás:**
-1. **Crear `movies.store.test.ts`**
+1. **Crear tests para `movies.store.svelte.ts`**
    - Test: loadMovies()
    - Test: createMovie()
    - Test: updateMovie()
@@ -95,7 +95,7 @@ cd mivideoteca-web
 npm install
 ```
 
-### 3. Configurar variables de entorno
+### 3. Configurar variables de entorno (opcional)
 ```bash
 # Crea el archivo .env en la raíz del proyecto
 cp .env.example .env
@@ -103,31 +103,26 @@ cp .env.example .env
 
 Edita `.env` con la URL de tu backend:
 ```env
-# UD4: Desarrollo local
+# Por defecto usa http://localhost:3000 si no existe .env
 PUBLIC_API_URL=http://localhost:3000
-
-# UD5: Producción
-# PUBLIC_API_URL=https://tu-api.onrender.com
 ```
+
+> **Nota:** Si no creas `.env`, la app usará `http://localhost:3000` automáticamente.
 
 ---
 
 ## ▶️ Ejecutar la aplicación
 
-### Desarrollo (conecta a backend local)
+### Desarrollo
 ```bash
 # Modo desarrollo con hot reload
 npm run dev
-
-# Con host específico (para acceder desde otros dispositivos)
-npm run dev -- --host
 
 # La app estará disponible en: http://localhost:5173
 ```
 
 ### Preview (simula producción)
 ```bash
-# Build + preview
 npm run build
 npm run preview
 ```
@@ -144,101 +139,116 @@ npm test
 # Ejecutar una vez
 npm run test:run
 
-# Con interfaz visual (recomendado para debugging)
+# Con interfaz visual
 npm run test:ui
-```
-
-### Ejecutar tests específicos
-```bash
-# Solo tests de api.service
-npm test -- api.service
-
-# Solo tests de auth.store
-npm test -- auth.store
-
-# Tests con verbose
-npm test -- --reporter=verbose
 ```
 
 ### Estado actual de tests (UD4)
 ```bash
-npm test
+npm run test:run
 
-# ✅ auth.store.test.ts (3 tests) - Implementado
-# ✅ api.service.test.ts (5 tests) - Solo autenticación
+# ✅ auth.store.test.ts - Implementado
+# ✅ api.service.test.ts - Solo autenticación
 # ⏸️ movies.store.test.ts - Se creará en video UD4
 ```
 
-### Interfaz visual de tests
-```bash
-# Abre una UI web interactiva
-npm run test:ui
-
-# Navega a: http://localhost:51204/__vitest__/
-```
-
 ---
 
-## 🏗️ Build para producción (UD5)
+## 🆕 Svelte 5 Runes
 
-### Generar build estático
-```bash
-# Build optimizado para producción
-npm run build
+Este proyecto usa **100% sintaxis moderna de Svelte 5**:
 
-# Los archivos estarán en: build/
+### Stores con Runes (`.svelte.ts`)
+
+```typescript
+// auth.store.svelte.ts
+let token = $state<string | null>(null);
+
+export const authToken = {
+  get value() { return token; },
+  set(value: string | null) { token = value; },
+  clear() { token = null; }
+};
 ```
 
-### Previsualizar build de producción
-```bash
-npm run preview
-```
+### Uso en componentes
 
----
-
-## 📚 Estructura del proyecto
-
-### Stores (Gestión de Estado)
-- **authToken** (`auth.store.ts`): Maneja el token JWT y su persistencia
-- **moviesStore** (`movies.store.ts`): Gestión centralizada del estado de películas (CRUD)
-
-### Services
-- **api.service** (`api.service.ts`): Todas las llamadas HTTP al backend
-
-### Arquitectura de datos
-Similar a Flutter:
-- **authToken**: Store para autenticación (equivalente a `AuthProvider`)
-- **moviesStore**: Store para películas (equivalente a `MovieProvider`)
-
-Ejemplo en un componente:
 ```svelte
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { moviesStore, movies, isLoadingMovies } from '$lib';
-  
-  onMount(() => {
-    moviesStore.loadMovies();
+  import { authToken } from '$lib/auth.store.svelte';
+  import { moviesStore } from '$lib/movies.store.svelte';
+
+  // Estado local con $state
+  let isLoading = $state(true);
+
+  // Efectos reactivos con $effect
+  $effect(() => {
+    if (authToken.value) {
+      moviesStore.loadMovies();
+    }
   });
 </script>
 
-{#if $isLoadingMovies}
-  <p>Cargando...</p>
-{:else}
-  {#each $movies as movie}
-    <div>{movie.title}</div>
-  {/each}
+<!-- Acceso a stores -->
+{#if authToken.value}
+  <p>Usuario autenticado</p>
 {/if}
+
+{#each moviesStore.movies as movie}
+  <div>{movie.title}</div>
+{/each}
 ```
 
-### Routing
-SvelteKit usa **file-based routing**:
-- `/login` → `src/routes/login/+page.svelte`
-- `/register` → `src/routes/register/+page.svelte`
-- `/movies` → `src/routes/(auth)/movies/+page.svelte`
+### Props con $props()
 
-### Layouts
-- **`+layout.svelte`**: Layout global con navbar
-- **`(auth)/+layout.svelte`**: Layout que requiere autenticación
+```svelte
+<script lang="ts">
+  let { 
+    movie,
+    ondelete,
+    onedit
+  }: {
+    movie: Movie;
+    ondelete?: (id: string) => void;
+    onedit?: (movie: Movie) => void;
+  } = $props();
+</script>
+```
+
+### Event handlers modernos
+
+```svelte
+<!-- Svelte 5 -->
+<button onclick={handleClick}>Click</button>
+<form onsubmit={handleSubmit}>
+
+<!-- En lugar de (Svelte 4 - deprecated) -->
+<button on:click={handleClick}>Click</button>
+<form on:submit|preventDefault={handleSubmit}>
+```
+
+---
+
+## 📚 Estructura de Stores
+
+### authToken (`auth.store.svelte.ts`)
+```typescript
+authToken.value      // Getter: obtiene el token actual
+authToken.set(token) // Setter: guarda token + localStorage
+authToken.clear()    // Logout: elimina token
+```
+
+### moviesStore (`movies.store.svelte.ts`)
+```typescript
+moviesStore.movies   // Getter: lista de películas
+moviesStore.loading  // Getter: estado de carga
+moviesStore.error    // Getter: mensaje de error
+
+moviesStore.loadMovies()              // Cargar todas
+moviesStore.createMovie(payload)      // Crear nueva
+moviesStore.updateMovie(id, payload)  // Actualizar
+moviesStore.deleteMovie(id)           // Eliminar
+```
 
 ---
 
@@ -246,14 +256,14 @@ SvelteKit usa **file-based routing**:
 
 ```
 UI (Svelte Components)
-    ↓ Lee/Modifica stores
-Stores (authToken, moviesStore)
-    ↓ Llama funciones
-Services (api.service)
+    ↓ Lee stores (authToken.value, moviesStore.movies)
+Stores (.svelte.ts con $state)
+    ↓ Llama funciones async
+Services (api.service.ts)
     ↓ fetch() HTTP Request
 Backend API (Express)
     ↓ Respuesta
-Service → Store → UI (reactividad automática)
+Service → Store ($state) → UI (reactividad automática)
 ```
 
 ---
@@ -262,23 +272,14 @@ Service → Store → UI (reactividad automática)
 
 | Componente | SvelteKit | Flutter | Express |
 |------------|-----------|---------|---------|
-| **Auth** | `auth.store.ts` | `auth_provider.dart` | `authController.js` |
+| **Auth** | `auth.store.svelte.ts` | `auth_provider.dart` | `authController.js` |
 | **Auth Tests** | ✅ Implementado | ✅ Implementado | ✅ Implementado |
-| **Movies** | `movies.store.ts` | `movie_provider.dart` | `movieController.js` |
+| **Movies** | `movies.store.svelte.ts` | `movie_provider.dart` | `movieController.js` |
 | **Movies Tests** | ⏸️ UD4 (video) | ⏸️ UD4 (video) | ⏸️ UD3 (video) |
 | **Favoritos** | ⏸️ UD4 (video) | ⏸️ UD4 (video) | ⏸️ UD3 (video) |
 | **Rating** | ⏸️ UD4 (ejercicio) | ⏸️ UD4 (ejercicio) | ⏸️ UD3 (ejercicio) |
 
 **Mismo patrón, diferentes tecnologías** ✅
-
----
-
-## 🌐 Plataformas soportadas
-
-- ✅ **Navegadores modernos** (Chrome, Firefox, Safari, Edge)
-- ✅ **Mobile web** (responsive design con Tailwind CSS)
-- ✅ **PWA** (instalable como app)
-- ✅ **SSR/SSG** (Server-Side Rendering opcional)
 
 ---
 
@@ -289,102 +290,46 @@ Service → Store → UI (reactividad automática)
 # Verifica que el backend esté corriendo
 curl http://localhost:3000/api/movies
 
-# Verifica la variable de entorno
-echo $PUBLIC_API_URL
-# o en Windows:
-echo %PUBLIC_API_URL%
-
-# Asegúrate de que empiece con PUBLIC_ para que sea visible en el cliente
+# Por defecto usa http://localhost:3000
+# Si necesitas otro puerto, crea .env:
+echo "PUBLIC_API_URL=http://localhost:8080" > .env
 ```
 
-### Error: "Cannot read properties of undefined (reading 'get')"
-```bash
-# En tests, asegúrate de mockear fetch correctamente:
-globalThis.fetch = vi.fn() as any;
+### Error en imports de stores
+```typescript
+// ✅ Correcto - incluir .svelte en la extensión
+import { authToken } from '$lib/auth.store.svelte';
 
-# Y que la respuesta tenga headers:
-{
-  ok: true,
-  headers: {
-    get: (name: string) => name === 'content-type' ? 'application/json' : null
-  },
-  json: async () => ({ ... })
-}
+// ❌ Incorrecto
+import { authToken } from '$lib/auth.store';
 ```
 
-### Tests fallan con "browser is not defined"
+### Error: "$state is not defined"
 ```bash
-# Verifica que el mock esté configurado:
-vi.mock('$app/environment', () => ({ browser: true }));
-
-# Y que localStorage esté mockeado antes de importar los stores
-```
-
-### Hot reload no funciona
-```bash
-# Reinicia el servidor de desarrollo
-# Ctrl+C para detener
-npm run dev
-```
-
-### CORS errors en desarrollo
-```bash
-# El backend debe permitir http://localhost:5173
-# Ver configuración CORS en mivideoteca-api
+# Verifica que el archivo tenga extensión .svelte.ts
+# Los runes solo funcionan en:
+# - Archivos .svelte (componentes)
+# - Archivos .svelte.ts (módulos)
 ```
 
 ---
 
-## 📦 Dependencias principales
+## 📦 Stack tecnológico
 
-```json
-{
-  "dependencies": {
-    "@sveltejs/kit": "^2.22.0",
-    "svelte": "^5.0.0"
-  },
-  "devDependencies": {
-    "typescript": "^5.0.0",
-    "vite": "^7.0.4",
-    "vitest": "^3.2.4",
-    "@vitest/ui": "^3.2.4",
-    "jsdom": "^27.0.0",
-    "tailwindcss": "^3.4.13"
-  }
-}
-```
-
-### Librerías clave
-- **SvelteKit**: Framework web full-stack
-- **Vite**: Build tool ultra-rápido
-- **Vitest**: Testing framework (compatible con Vite)
-- **Tailwind CSS**: Estilos utility-first
-- **TypeScript**: Tipado estático
-
----
-
-## 🎨 Estilos
-
-Este proyecto usa **Tailwind CSS** para los estilos:
-
-```svelte
-<!-- Ejemplo de componente con Tailwind -->
-<button 
-  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
->
-  Guardar
-</button>
-```
+- **Framework**: SvelteKit 2.x + Svelte 5
+- **Lenguaje**: TypeScript 5.x (estricto)
+- **Estilos**: Tailwind CSS 3.x
+- **Testing**: Vitest + jsdom
+- **Build**: Vite 7.x
 
 ---
 
 ## 🔗 Enlaces útiles
 
 - [Documentación de SvelteKit](https://kit.svelte.dev/)
-- [Svelte Tutorial](https://learn.svelte.dev/)
+- [Svelte 5 Runes](https://svelte.dev/docs/svelte/$state)
 - [Vitest Documentation](https://vitest.dev/)
 - [Tailwind CSS](https://tailwindcss.com/)
-- [Backend del proyecto](../mivideoteca-api/README.md)
 
 ---
 
@@ -394,7 +339,7 @@ Proyecto educativo - Curso "De Cero a Deploy"
 
 ## 📄 Licencia
 
-Este proyecto es material educativo.
+MIT - Este proyecto es material educativo.
 
 ---
 
@@ -402,33 +347,10 @@ Este proyecto es material educativo.
 
 1. ✅ Completa la **UD3** (Backend) primero
 2. ✅ Instala las dependencias: `npm install`
-3. ✅ Configura el `.env` con la URL de tu backend local
-4. ✅ Ejecuta los tests: `npm test`
+3. ✅ (Opcional) Configura `.env` si tu backend usa otro puerto
+4. ✅ Ejecuta los tests: `npm run test:run`
 5. ✅ Corre la app: `npm run dev`
 6. 🎬 Sigue el video de UD4 para tests de Movies + Favoritos
 7. 📝 Implementa el ejercicio de Rating
 
 **¡Listo para UD4!** 🚀
-
----
-
-## 📝 Notas adicionales
-
-### Diferencias con el proyecto Flutter
-
-Este proyecto tiene **la misma funcionalidad** que `mivideoteca-app` pero implementado con **tecnologías web**:
-
-- **Mismo backend**: Ambos consumen la misma API REST
-- **Misma lógica**: Login, CRUD, favoritos, rating
-- **Diferentes tecnologías**: Web vs Mobile nativo
-- **Misma arquitectura**: Stores vs Providers (mismo concepto)
-- **Mismos tests conceptuales**: Diferentes frameworks pero mismo objetivo
-
-### ¿Por qué dos frontends?
-
-Este curso enseña **desarrollo full-stack completo**:
-- **Backend**: Express + SQLite (UD3) → PostgreSQL (UD5)
-- **Web**: SvelteKit (UD4 - DAW obligatorio)
-- **Mobile**: Flutter (UD4 - DAM obligatorio)
-
-Aprenderás a construir aplicaciones que funcionan **en cualquier plataforma**. 🌍📱

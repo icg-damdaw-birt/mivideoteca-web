@@ -9,7 +9,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { api, ApiError } from './api.service';
-import { authToken } from './auth.store';
+import { authToken } from './auth.store.svelte';
 
 // Mock de fetch global
 globalThis.fetch = vi.fn() as any;

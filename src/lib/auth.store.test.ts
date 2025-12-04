@@ -1,12 +1,11 @@
 /**
- * TESTS DEL AUTH STORE
+ * TESTS DEL AUTH STORE (Svelte 5 Runes)
  * 
  * Tests más simples porque el store solo maneja el token.
  * La lógica de autenticación está en api.service.test.ts
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { get } from 'svelte/store';
 
 // Mock del módulo $app/environment ANTES de importar el store
 vi.mock('$app/environment', () => ({ browser: true }));
@@ -25,9 +24,9 @@ const localStorageMock = (() => {
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
 
 // Importar DESPUÉS de configurar los mocks
-import { authToken } from './auth.store';
+import { authToken } from './auth.store.svelte';
 
-describe('Auth Store', () => {
+describe('Auth Store (Svelte 5 Runes)', () => {
   beforeEach(() => {
     localStorageMock.clear();
     authToken.clear();
@@ -41,8 +40,8 @@ describe('Auth Store', () => {
       // ACT
       authToken.set(newToken);
 
-      // ASSERT
-      expect(get(authToken)).toBe(newToken);
+      // ASSERT - Svelte 5: usar authToken.value en lugar de get()
+      expect(authToken.value).toBe(newToken);
       expect(localStorageMock.getItem('mivideoteca-token')).toBe(newToken);
     });
   });
@@ -51,13 +50,13 @@ describe('Auth Store', () => {
     it('debería cerrar sesión y limpiar token', () => {
       // ARRANGE - Primero guardamos un token
       authToken.set('some-token');
-      expect(get(authToken)).toBe('some-token');
+      expect(authToken.value).toBe('some-token');
 
       // ACT
       authToken.clear();
 
       // ASSERT
-      expect(get(authToken)).toBeNull();
+      expect(authToken.value).toBeNull();
       expect(localStorageMock.getItem('mivideoteca-token')).toBeNull();
     });
   });
@@ -72,13 +71,13 @@ describe('Auth Store', () => {
       authToken.refreshFromStorage();
 
       // ASSERT
-      expect(get(authToken)).toBe(savedToken);
+      expect(authToken.value).toBe(savedToken);
     });
   });
 });
 
 /**
- * NOTAS PARA ESTUDIANTES:
+ * NOTAS PARA ESTUDIANTES (Svelte 5):
  * 
  * 1. Orden de imports importante
  *    - Primero mockeamos $app/environment y localStorage
@@ -89,9 +88,9 @@ describe('Auth Store', () => {
  *    - Vitest necesita que los mocks estén antes de los imports
  *    - Por eso vi.mock() está arriba del todo
  * 
- * 3. get() de Svelte
- *    - Obtiene el valor actual sin suscribirse
- *    - Perfecto para tests
+ * 3. authToken.value (Svelte 5 Runes)
+ *    - Acceso directo al valor del estado
+ *    - Reemplaza get() de svelte/store
  * 
  * 4. authToken.clear() vs authToken.set(null)
  *    - clear() elimina también de localStorage

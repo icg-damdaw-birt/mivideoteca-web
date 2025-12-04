@@ -4,7 +4,7 @@
   import { onMount } from 'svelte';
 
   import { api, ApiError } from '$lib/api.service';
-  import { authToken } from '$lib/auth.store';
+  import { authToken } from '$lib/auth.store.svelte';
   import MovieCard from '$lib/components/MovieCard.svelte';
   import MovieForm from '$lib/components/MovieForm.svelte';
   import type { Movie, MovieFormSubmit, MoviePayload } from '$lib/types';
@@ -45,7 +45,7 @@
     }
 
     // Guard de autenticación: redirige si no hay token
-    if (!$authToken) {
+    if (!authToken.value) {
       goto('/login');
       isLoading = false;
       return;
@@ -57,7 +57,7 @@
 
   // Reactive statement → $effect: redirige automáticamente si se cierra sesión
   $effect(() => {
-    if (browser && !$authToken && !isLoading) {
+    if (browser && !authToken.value && !isLoading) {
       goto('/login');
     }
   });

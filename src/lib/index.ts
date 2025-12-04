@@ -1,5 +1,5 @@
-﻿// Exportaciones centrales del proyecto
+﻿// Exportaciones centrales del proyecto (Svelte 5 Runes)
 export { api, ApiError } from './api.service';
-export { authToken } from './auth.store';
-export { moviesStore, movies, isLoadingMovies, moviesError } from './movies.store';
+export { authToken } from './auth.store.svelte';
+export { moviesStore } from './movies.store.svelte';
 export * from './types';

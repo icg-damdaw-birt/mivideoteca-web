@@ -1,6 +1,6 @@
 ﻿<script lang="ts">
   import { goto } from '$app/navigation';
-  import { authToken } from '$lib/auth.store';
+  import { authToken } from '$lib/auth.store.svelte';
 
   // Acción de logout: limpia el token y redirige
   function logout() {
@@ -14,11 +14,11 @@
   <nav class="container mx-auto flex items-center justify-between px-6 py-4">
     <a href="/" class="text-xl font-bold text-slate-800">MiVideoteca</a>
     <div class="flex items-center gap-3">
-      {#if $authToken}
+      {#if authToken.value}
         <button
           type="button"
           class="rounded bg-red-500 px-4 py-2 text-white transition hover:bg-red-600"
-          on:click={logout}
+          onclick={logout}
         >
           Cerrar sesión
         </button>

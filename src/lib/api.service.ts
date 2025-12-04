@@ -1,6 +1,4 @@
-﻿import { get } from 'svelte/store';
-
-import { authToken } from './auth.store';
+﻿import { authToken } from './auth.store.svelte';
 import type {
   ApiErrorPayload,
   Credentials,
@@ -63,7 +61,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
   // Autenticación JWT automática (excepto login/register)
   if (auth) {
-    const token = get(authToken); // Lee el store síncrono
+    const token = authToken.value; // Svelte 5: acceso directo al valor
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }

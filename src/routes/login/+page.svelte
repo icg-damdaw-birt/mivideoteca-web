@@ -2,7 +2,7 @@
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { api, ApiError } from '$lib/api.service';
-  import { authToken } from '$lib/auth.store';
+  import { authToken } from '$lib/auth.store.svelte';
 
   let email = $state('');
   let password = $state('');
@@ -11,7 +11,7 @@
 
   // Evita mostrar la pantalla de login cuando ya existe token.
   $effect(() => {
-    if (browser && $authToken) {
+    if (browser && authToken.value) {
       goto('/');
     }
   });

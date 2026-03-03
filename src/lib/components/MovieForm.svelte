@@ -19,10 +19,10 @@
   } = $props();
 
   // Estado interno del formulario con $state
-  let title = $state<string | number>('');
-  let director = $state<string | number>('');
+  let title = $state('');
+  let director = $state('');
   let year = $state<string | number>('');
-  let posterUrl = $state<string | number>('');
+  let posterUrl = $state('');
   let error = $state<string | null>(null);
   let lastInitialId = $state<string | null>(null);
 
@@ -49,24 +49,20 @@
     }
   });
 
-  function toString(value: string | number): string {
-    return typeof value === 'number' ? String(value) : value;
-  }
-
   function validateForm(): boolean {
     error = null;
 
-    if (!title.toString().trim()) {
+    if (!title.trim()) {
       error = 'El título es obligatorio';
       return false;
     }
 
-    if (!director.toString().trim()) {
+    if (!director.trim()) {
       error = 'El director es obligatorio';
       return false;
     }
 
-    const yearNum = parseInt(year.toString(), 10);
+    const yearNum = parseInt(String(year), 10);
     if (!yearNum || yearNum < 1800 || yearNum > new Date().getFullYear() + 5) {
       error = 'Introduce un año válido';
       return false;
@@ -80,21 +76,13 @@
     
     if (!validateForm()) return;
 
-    const trimmedTitle = toString(title).trim();
-    const trimmedDirector = toString(director).trim();
-    const trimmedYearSource = toString(year);
-    const trimmedYear = trimmedYearSource.trim();
-    const trimmedPoster = toString(posterUrl).trim();
+    const trimmedTitle = title.trim();
+    const trimmedDirector = director.trim();
+    const trimmedPoster = posterUrl.trim();
+    const numericYear = Number(year);
 
-    if (!trimmedTitle || !trimmedDirector || !trimmedYear) {
+    if (!trimmedTitle || !trimmedDirector || Number.isNaN(numericYear) || numericYear < 1888) {
       error = 'Completa el título, director y un año válido.';
-      return;
-    }
-
-    const numericYear = Number(trimmedYear);
-
-    if (Number.isNaN(numericYear) || numericYear < 1888) {
-      error = 'Introduce un año válido.';
       return;
     }
 

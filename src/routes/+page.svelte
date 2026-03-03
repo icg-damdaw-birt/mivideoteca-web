@@ -3,117 +3,75 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
 
-  import { api, ApiError } from '$lib/api.service';
-  import { authToken } from '$lib/auth.store.svelte';
+  import { authToken, moviesStore } from '$lib';
   import MovieCard from '$lib/components/MovieCard.svelte';
   import MovieForm from '$lib/components/MovieForm.svelte';
   import type { Movie, MovieFormSubmit, MoviePayload } from '$lib/types';
 
-  // Estado reactivo de la página: Svelte 5 runes
-  let movies = $state<Movie[]>([]);
+  // Estado local de la página (concerns de UI, no de negocio)
   let editingMovie = $state<Movie | null>(null);
-  let isLoading = $state(true);
-  let isSubmitting = $state(false);
   let feedbackMessage = $state<{ type: 'error' | 'info'; text: string } | null>(null);
-
-  // Carga las películas del backend y mantiene sincronizado el estado de edición
-  async function loadMovies() {
-    isLoading = true;
-    feedbackMessage = null;
-    try {
-      movies = await api.getMovies();
-      // Si estamos editando, actualiza los datos desde el servidor
-      if (editingMovie) {
-        const refreshed = movies.find((movie) => movie.id === editingMovie?.id);
-        editingMovie = refreshed ?? editingMovie;
-      }
-    } catch (error) {
-      const message =
-        error instanceof ApiError
-          ? error.message
-          : 'No se pudieron cargar las películas.';
-      feedbackMessage = { type: 'error', text: message };
-    } finally {
-      isLoading = false;
-    }
-  }
 
   // Lifecycle: carga inicial solo en el navegador
   onMount(() => {
-    if (!browser) {
-      return;
-    }
+    if (!browser) return;
 
     // Guard de autenticación: redirige si no hay token
     if (!authToken.value) {
       goto('/login');
-      isLoading = false;
       return;
     }
 
-    // Carga las películas del usuario
-    loadMovies();
+    // Carga las películas del usuario a través del store
+    moviesStore.loadMovies();
   });
 
-  // Reactive statement → $effect: redirige automáticamente si se cierra sesión
+  // Redirige automáticamente si se cierra sesión
   $effect(() => {
-    if (browser && !authToken.value && !isLoading) {
+    if (browser && !authToken.value && !moviesStore.loading) {
       goto('/login');
+    }
+  });
+
+  // Refleja errores del store en el feedback de la página
+  $effect(() => {
+    if (moviesStore.error) {
+      feedbackMessage = { type: 'error', text: moviesStore.error };
     }
   });
 
   // Maneja el envío del formulario: decide si crear o actualizar película
   async function handleFormSubmit(data: MovieFormSubmit) {
-    isSubmitting = true;
     feedbackMessage = null;
+    moviesStore.clearError();
 
     const { id, title, director, year, posterUrl } = data;
-    const payload: MoviePayload = {
-      title,
-      director,
-      year,
-      posterUrl,
-    };
+    const payload: MoviePayload = { title, director, year, posterUrl };
 
-    try {
-      if (id) {
-        // Modo edición: actualiza película existente
-        const updated = await api.updateMovie(id, payload);
-        movies = movies.map((movie) => (movie.id === updated.id ? updated : movie));
+    if (id) {
+      // Modo edición: actualiza película existente
+      const ok = await moviesStore.updateMovie(id, payload);
+      if (ok) {
         feedbackMessage = { type: 'info', text: 'Película actualizada correctamente.' };
         editingMovie = null;
-      } else {
-        // Modo creación: añade nueva película
-        const movie = await api.createMovie(payload);
-        movies = [movie, ...movies];  // Prepend: más recientes primero
+      }
+    } else {
+      // Modo creación: añade nueva película
+      const ok = await moviesStore.createMovie(payload);
+      if (ok) {
         feedbackMessage = { type: 'info', text: 'Película guardada correctamente.' };
       }
-    } catch (error) {
-      const message =
-        error instanceof ApiError
-          ? error.message
-          : 'No se pudo guardar la película.';
-      feedbackMessage = { type: 'error', text: message };
-    } finally {
-      isSubmitting = false;
     }
   }
 
-  // Elimina película con optimistic updates: actualiza UI inmediatamente
+  // Elimina película a través del store
   async function handleDelete(id: string) {
-    const prev = movies;
-    movies = movies.filter((movie) => movie.id !== id);
+    feedbackMessage = null;
+    moviesStore.clearError();
 
-    try {
-      await api.deleteMovie(id);
+    const ok = await moviesStore.deleteMovie(id);
+    if (ok) {
       feedbackMessage = { type: 'info', text: 'Película eliminada.' };
-    } catch (error) {
-      movies = prev;
-      const message =
-        error instanceof ApiError
-          ? error.message
-          : 'No se pudo eliminar la película.';
-      feedbackMessage = { type: 'error', text: message };
     }
   }
 
@@ -150,17 +108,17 @@
 
   <div class="grid gap-8 lg:grid-cols-[2fr_1fr]">
     <div>
-      {#if isLoading}
+      {#if moviesStore.loading}
         <div class="rounded-lg border border-slate-200 bg-white p-8 text-center text-slate-500 shadow-sm">
           Cargando películas...
         </div>
-      {:else if movies.length === 0}
+      {:else if moviesStore.movies.length === 0}
         <div class="rounded-lg border border-dashed border-slate-300 bg-white p-12 text-center text-slate-500 shadow-sm">
           Tu videoteca está vacía. Añade la primera película usando el formulario.
         </div>
       {:else}
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {#each movies as movie (movie.id)}
+          {#each moviesStore.movies as movie (movie.id)}
             <MovieCard {movie} ondelete={handleDelete} onedit={handleEdit} />
           {/each}
         </div>
@@ -177,7 +135,7 @@
           : 'Completa los datos y guárdalos para verlos en la lista.'}
       </p>
       <MovieForm
-        bind:isSubmitting
+        isSubmitting={moviesStore.mutating}
         bind:initialMovie={editingMovie}
         submitLabel={editingMovie ? 'Guardar cambios' : 'Añadir película'}
         showCancel={Boolean(editingMovie)}
